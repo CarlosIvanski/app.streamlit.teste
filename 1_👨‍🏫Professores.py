@@ -49,73 +49,35 @@ unidades = ['Satélite', 'Vicentina', 'Jardim', 'Online']
 if 'disponibilidade' not in st.session_state:
     st.session_state.disponibilidade = {nome: {} for nome in nomes_iniciais}
 
-# Tabela de disponibilidade e checkboxes por unidade
-st.subheader("Tabela de Disponibilidade:")
+# Cria as abas
+tab1, tab2 = st.tabs(["Dados do Professor", "Tabela de Disponibilidade"])
 
-# Define a largura das colunas
-col_widths = [1, 1, 1, 1, 1, 1, 1, 1]
+with tab1:
+    st.subheader("Dados do Professor")
 
-# Adicionando CSS para melhorar a visualização e adicionar scroll
-st.markdown(
-    """
-    <style>
-    .checkbox-no-wrap {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-    .dataframe {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    .dataframe th, .dataframe td {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-    .dataframe tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-    .dataframe th {
-        background-color: #4CAF50;
-        color: white;
-    }
-    .scrollable-container {
-        max-height: 500px;
-        overflow-y: auto;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-for i, nome_inicial in enumerate(nomes_iniciais):
-    cols = st.columns(col_widths)
-
-    with cols[0]:
+    for i, nome_inicial in enumerate(nomes_iniciais):
+        st.write(f"Configurações para {nome_inicial}:")
+        
+        # Atualiza o nome do professor no session state
         nome_professor = st.text_input(f"Nome do professor", nome_inicial, key=f"nome_{i}")
 
-    # Atualiza o nome do professor no session state
-    if nome_professor != nome_inicial:
-        st.session_state.disponibilidade[nome_professor] = st.session_state.disponibilidade.pop(nome_inicial, {})
+        if nome_professor != nome_inicial:
+            st.session_state.disponibilidade[nome_professor] = st.session_state.disponibilidade.pop(nome_inicial, {})
 
-    # Atualiza o dicionário com base no session state
-    if nome_professor not in st.session_state.disponibilidade:
-        st.session_state.disponibilidade[nome_professor] = {}
+        if nome_professor not in st.session_state.disponibilidade:
+            st.session_state.disponibilidade[nome_professor] = {}
 
-    with cols[1]:
         st.write("Unidades")
         for unidade in unidades:
             st.session_state.disponibilidade[nome_professor][unidade] = st.checkbox(f"{unidade}", 
                 value=st.session_state.disponibilidade[nome_professor].get(unidade, False), 
                 key=f"{nome_professor}_{unidade}")
 
-    with cols[2]:
         st.write("Carro")
         st.session_state.disponibilidade[nome_professor]['Carro'] = st.checkbox("Tem carro", 
             value=st.session_state.disponibilidade[nome_professor].get('Carro', False), 
             key=f"{nome_professor}_carro")
 
-    with cols[3]:
         st.write("Máquina")
         maquinas = {}
         with st.container():
@@ -132,7 +94,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Máquina'] = [key for key, value in maquinas.items() if value]
 
-    with cols[4]:
         st.write("Disponibilidade")
         periodos = ['Manhã', 'Tarde', 'Noite', 'Sábado']
         disponibilidade_horarios = {}
@@ -145,7 +106,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Disponibilidade'] = [key for key, value in disponibilidade_horarios.items() if value]
 
-    with cols[5]:
         st.write("Módulo")
         modulo_opcoes = {}
         with st.container():
@@ -171,7 +131,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
 
-    with cols[6]:
         st.write("Idioma")
         idioma_opcoes = {}
         with st.container():
@@ -185,7 +144,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
 
-    with cols[7]:
         observacoes = st.text_area(f"Observações", 
             value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
             key=f"{nome_professor}_observacoes")
@@ -209,43 +167,23 @@ def converter_para_dataframe(dados, nome_usuario, data):
         registros.append(registro)
     return pd.DataFrame(registros)
 
-# Converter os dados coletados para um DataFrame
-df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
-
-# Botão para salvar os dados na tabela em tempo real
-if st.button("Salvar dados"):
-    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
-    salvar_dados(st.session_state.df_disponibilidade)
-    st.success("Dados salvos com sucesso!")
-
-# Definir uma lista de usuários com permissões especiais
-usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
-
-# Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
-if nome_preenchedor in usuarios_superadmin:
-    st.subheader("Tabela Atualizada de Disponibilidade")
-
-    # Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
-    for i, row in st.session_state.df_disponibilidade.iterrows():
-        cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
-        for j, value in enumerate(row):
-            cols[j].write(value)
-        
-        # Exibir o botão de deletar apenas se o nome do preenchedor estiver na lista de permissões
-        if cols[len(row)].button("Deletar", key=f"delete_{i}"):
-            deletar_linha(i)
-
-    # Botão para exportar os dados para Excel, visível para todos os usuários na lista de permissões especiais
-    st.subheader("Exportar Dados para Excel")
-    if st.button("Exportar para Excel"):
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-            st.session_state.df_disponibilidade.to_excel(writer, index=False, sheet_name='Disponibilidade')
-        buffer.seek(0)
-        
-        st.download_button(
-            label="Baixar Excel",
-            data=buffer,
-            file_name="disponibilidade_professores.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+with tab2:
+    st.subheader("Tabela de Disponibilidade")
+    
+    # Converter os dados para DataFrame e exibir
+    df_disponibilidade = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
+    
+    st.write(df_disponibilidade)
+    
+    # Permite a exclusão de linhas
+    index_para_deletar = st.number_input("Digite o número da linha para deletar", min_value=0, max_value=len(df_disponibilidade)-1, step=1)
+    if st.button("Deletar Linha"):
+        deletar_linha(index_para_deletar)
+    
+    # Exportar dados para Excel
+    st.download_button(
+        label="Exportar para Excel",
+        data=df_disponibilidade.to_excel(index=False),
+        file_name='disponibilidade.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
