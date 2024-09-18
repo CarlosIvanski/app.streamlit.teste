@@ -9,7 +9,7 @@ def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
         return pd.read_csv("disponibilidade.csv")
     else:
-        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor', 'Data'])
+        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Idioma', 'Observações', 'Nome do Preenchendor', 'Data'])
 
 # Função para salvar dados em um arquivo CSV
 def salvar_dados(df):
@@ -53,7 +53,7 @@ if 'disponibilidade' not in st.session_state:
 st.subheader("Tabela de Disponibilidade:")
 
 # Define a largura das colunas
-col_widths = [1, 1, 1, 1, 1, 1, 1]
+col_widths = [1, 1, 1, 1, 1, 1, 1, 1]
 
 # Adicionando CSS para melhorar a visualização
 st.markdown(
@@ -145,43 +145,42 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         st.write("Módulo")
         modulo_opcoes = {}
         with st.container():
-        st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-        modulo_opcoes['Stage 1'] = st.checkbox("Stage 1", 
-            value='Stage 1' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-            key=f"{nome_professor}_stage1")
-        modulo_opcoes['VIP'] = st.checkbox("VIP", 
-            value='VIP' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-            key=f"{nome_professor}_vip")
-        modulo_opcoes['CONVERSATION'] = st.checkbox("CONVERSATION", 
-            value='CONVERSATION' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-            key=f"{nome_professor}_conversation")
-        modulo_opcoes['MBA'] = st.checkbox("MBA", 
-            value='MBA' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-            key=f"{nome_professor}_mba")
-        modulo_opcoes['Kids'] = st.checkbox("Kids", 
-            value='Kids' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-            key=f"{nome_professor}_kids")
-        modulo_opcoes['In-Company'] = st.checkbox("In-Company", 
-            value='In-Company' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-            key=f"{nome_professor}_incompany")
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
+            st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
+            modulo_opcoes['Stage 1'] = st.checkbox("Stage 1", 
+                value='Stage 1' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
+                key=f"{nome_professor}_stage1")
+            modulo_opcoes['VIP'] = st.checkbox("VIP", 
+                value='VIP' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
+                key=f"{nome_professor}_vip")
+            modulo_opcoes['CONVERSATION'] = st.checkbox("CONVERSATION", 
+                value='CONVERSATION' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
+                key=f"{nome_professor}_conversation")
+            modulo_opcoes['MBA'] = st.checkbox("MBA", 
+                value='MBA' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
+                key=f"{nome_professor}_mba")
+            modulo_opcoes['Kids'] = st.checkbox("Kids", 
+                value='Kids' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
+                key=f"{nome_professor}_kids")
+            modulo_opcoes['In-Company'] = st.checkbox("In-Company", 
+                value='In-Company' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
+                key=f"{nome_professor}_incompany")
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
 
-    with cols[6]:  # Use uma nova coluna
-    st.write("Idioma")
-    idioma_opcoes = {}
-    with st.container():
-        st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-        idioma_opcoes['Inglês'] = st.checkbox("Inglês", 
-            value='Inglês' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-            key=f"{nome_professor}_ingles")
-        idioma_opcoes['Espanhol'] = st.checkbox("Espanhol", 
-            value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-            key=f"{nome_professor}_espanhol")
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
+    with cols[6]:
+        st.write("Idioma")
+        idioma_opcoes = {}
+        with st.container():
+            st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
+            idioma_opcoes['Inglês'] = st.checkbox("Inglês", 
+                value='Inglês' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
+                key=f"{nome_professor}_ingles")
+            idioma_opcoes['Espanhol'] = st.checkbox("Espanhol", 
+                value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
+                key=f"{nome_professor}_espanhol")
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
 
-    
     with cols[7]:
         st.write("Observações")
         observacoes = st.text_area("Observações", 
@@ -202,7 +201,7 @@ def converter_para_dataframe(dados, nome_usuario, data):
             'Módulo': ', '.join(detalhes['Modulo']),
             'Observações': detalhes.get('Observações', ''),
             'Nome do Preenchendor': nome_usuario,
-            'Data': data.strftime('%d-%m-%Y')  # Garantindo que a data seja formatada sem hora
+            'Data': data.strftime('%Y-%m-%d')  # Garantindo que a data seja formatada sem hora
         }
         registros.append(registro)
     return pd.DataFrame(registros)
