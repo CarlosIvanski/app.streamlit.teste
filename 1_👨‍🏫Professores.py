@@ -190,7 +190,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
 
     with cols2[3]:
-        st.write("Observações")
         st.session_state.disponibilidade[nome_professor]['Observações'] = st.text_area("Observações", 
             value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
             key=f"{nome_professor}_observacoes")
