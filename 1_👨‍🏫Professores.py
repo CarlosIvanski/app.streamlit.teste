@@ -9,7 +9,7 @@ def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
         return pd.read_csv("disponibilidade.csv")
     else:
-        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor', 'Data'])
+        return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor', 'Data', 'Dominio'])
 
 # Função para salvar dados em um arquivo CSV
 def salvar_dados(df):
@@ -53,7 +53,7 @@ if 'disponibilidade' not in st.session_state:
 st.subheader("Tabela de Disponibilidade:")
 
 # Define a largura das colunas
-col_widths = [1, 1, 1, 1, 1, 1, 1]
+col_widths = [1, 1, 1, 1, 1, 1, 1, 1, 1]
 
 # Adicionando CSS para melhorar a visualização
 st.markdown(
@@ -158,6 +158,9 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             modulo_opcoes['MBA'] = st.checkbox("MBA", 
                 value='MBA' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
                 key=f"{nome_professor}_mba")
+            modulo_opcoes['KIDS'] = st.checkbox("KIDS", 
+                value='KIDS' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
+                key=f"{nome_professor}_kids")
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
 
@@ -168,61 +171,47 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             key=f"{nome_professor}_observacoes")
         st.session_state.disponibilidade[nome_professor]['Observações'] = observacoes
 
-# Função para converter os dados para DataFrame
-def converter_para_dataframe(dados, nome_usuario, data):
-    registros = []
-    for professor, detalhes in dados.items():
-        registro = {
-            'Professor': professor,
-            'Unidades': ', '.join([unidade for unidade, selecionado in detalhes.items() if unidade in unidades and selecionado]),
-            'Carro': 'Sim' if detalhes.get('Carro', False) else 'Não',
-            'Máquinas': ', '.join(detalhes['Máquina']),
-            'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
-            'Módulo': ', '.join(detalhes['Modulo']),
-            'Observações': detalhes.get('Observações', ''),
-            'Nome do Preenchendor': nome_usuario,
-            'Data': data.strftime('%Y-%m-%d')  # Garantindo que a data seja formatada sem hora
+    with cols[7]:
+        st.write("Domínio")
+        dominio_opcoes = {
+            'Inglês': st.checkbox("Inglês", 
+                value='Inglês' in st.session_state.disponibilidade[nome_professor].get('Dominio', []), 
+                key=f"{nome_professor}_ingles"),
+            'Espanhol': st.checkbox("Espanhol", 
+                value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Dominio', []), 
+                key=f"{nome_professor}_espanhol")
         }
-        registros.append(registro)
-    return pd.DataFrame(registros)
+        st.session_state.disponibilidade[nome_professor]['Dominio'] = [key for key, value in dominio_opcoes.items() if value]
 
-# Converter os dados coletados para um DataFrame
-df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
+    # Adicionar uma coluna extra para ajustar o layout
+    with cols[8]:
+        st.write("")  # Coluna vazia para espaçamento
 
-# Botão para salvar os dados na tabela em tempo real
-if st.button("Salvar dados"):
-    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
-    salvar_dados(st.session_state.df_disponibilidade)
+# Função para converter os dados para DataFrame
+def converter_para_dataframe():
+    data = []
+    for professor, info in st.session_state.disponibilidade.items():
+        row = {
+            'Professor': professor,
+            'Unidades': ", ".join([unidade for unidade in unidades if info.get(unidade, False)]),
+            'Carro': 'Sim' if info.get('Carro', False) else 'Não',
+            'Máquinas': ", ".join(info.get('Máquina', [])),
+            'Disponibilidade': ", ".join(info.get('Disponibilidade', [])),
+            'Módulo': ", ".join(info.get('Modulo', [])),
+            'Observações': info.get('Observações', ''),
+            'Nome do Preenchendor': nome_preenchedor,
+            'Data': data_modificada_formatada,
+            'Dominio': ", ".join(info.get('Dominio', []))
+        }
+        data.append(row)
+    return pd.DataFrame(data)
+
+# Botão para salvar os dados
+if st.button("Salvar"):
+    df = converter_para_dataframe()
+    salvar_dados(df)
     st.success("Dados salvos com sucesso!")
 
-# Definir uma lista de usuários com permissões especiais
-usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
-
-# Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
-if nome_preenchedor in usuarios_superadmin:
-    st.subheader("Tabela Atualizada de Disponibilidade")
-
-    # Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
-    for i, row in st.session_state.df_disponibilidade.iterrows():
-        cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
-        for j, value in enumerate(row):
-            cols[j].write(value)
-        
-        # Exibir o botão de deletar apenas se o nome do preenchedor estiver na lista de permissões
-        if cols[len(row)].button("Deletar", key=f"delete_{i}"):
-            deletar_linha(i)
-
-    # Botão para exportar os dados para Excel, visível para todos os usuários na lista de permissões especiais
-    st.subheader("Exportar Dados para Excel")
-    if st.button("Exportar para Excel"):
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-            st.session_state.df_disponibilidade.to_excel(writer, index=False, sheet_name='Disponibilidade')
-        buffer.seek(0)
-        
-        st.download_button(
-            label="Baixar Excel",
-            data=buffer,
-            file_name="disponibilidade_professores.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+# Exibição dos dados salvos
+st.subheader("Dados Salvos:")
+st.write(st.session_state.df_disponibilidade)
