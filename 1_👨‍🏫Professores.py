@@ -4,6 +4,8 @@ import os
 import io
 from datetime import datetime
 
+st.set_page_config(layout="wide")
+
 # Função para carregar os dados de um arquivo CSV
 def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
