@@ -55,7 +55,7 @@ st.subheader("Tabela de Disponibilidade:")
 # Define a largura das colunas
 col_widths = [1, 1, 1, 1, 1, 1, 1, 1]
 
-# Adicionando CSS para melhorar a visualização
+# Adicionando CSS para melhorar a visualização e adicionar scroll
 st.markdown(
     """
     <style>
@@ -78,6 +78,10 @@ st.markdown(
     .dataframe th {
         background-color: #4CAF50;
         color: white;
+    }
+    .scrollable-container {
+        max-height: 500px;
+        overflow-y: auto;
     }
     </style>
     """,
@@ -182,8 +186,7 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
 
     with cols[7]:
-        st.write("Observações")
-        observacoes = st.text_area("Observações", 
+        observacoes = st.text_area(f"Observações", 
             value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
             key=f"{nome_professor}_observacoes")
         st.session_state.disponibilidade[nome_professor]['Observações'] = observacoes
