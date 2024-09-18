@@ -186,9 +186,6 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             idioma_opcoes['Espanhol'] = st.checkbox("Espanhol", 
                 value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
                 key=f"{nome_professor}_espanhol")
-            idioma_opcoes['Alemão'] = st.checkbox("Alemão", 
-                value='Alemão' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-                key=f"{nome_professor}_alemao")
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
 
