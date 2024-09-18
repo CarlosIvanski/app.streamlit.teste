@@ -20,13 +20,25 @@ def converter_para_dataframe(dados, nome_usuario, data):
         registros.append(registro)
     return pd.DataFrame(registros)
 
+# Inicializar o session_state se necessário
+if 'disponibilidade' not in st.session_state:
+    st.session_state.disponibilidade = {}
+if 'df_disponibilidade' not in st.session_state:
+    st.session_state.df_disponibilidade = pd.DataFrame()
+
+# Variáveis de exemplo (substitua com suas variáveis reais)
+nome_preenchedor = "Nome do Preenchendor"  # Substitua com a variável real
+data_modificacao = pd.Timestamp.now()  # Substitua com a data real
+unidades = ["Unidade1", "Unidade2", "Unidade3"]  # Substitua com suas unidades reais
+
 # Converter os dados coletados para um DataFrame
 df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
 
 # Botão para salvar os dados na tabela em tempo real
 if st.button("Salvar dados"):
     st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
-    salvar_dados(st.session_state.df_disponibilidade)
+    # Implementar a função salvar_dados se necessário
+    # salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
 
 # Definir uma lista de usuários com permissões especiais
