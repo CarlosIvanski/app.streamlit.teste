@@ -1,3 +1,7 @@
+import streamlit as st
+import pandas as pd
+import io
+
 # Função para converter os dados para DataFrame
 def converter_para_dataframe(dados, nome_usuario, data):
     registros = []
