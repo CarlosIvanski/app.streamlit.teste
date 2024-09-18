@@ -146,6 +146,26 @@ for i, nome_inicial in enumerate(nomes_iniciais):
         st.session_state.disponibilidade[nome_professor]['Disponibilidade'] = [key for key, value in disponibilidade_horarios.items() if value]
 
     with cols[5]:
+        st.write("Idioma")
+        idioma_opcoes = {}
+        with st.container():
+            st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
+            idioma_opcoes['Inglês'] = st.checkbox("Inglês", 
+                value='Inglês' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
+                key=f"{nome_professor}_ingles")
+            idioma_opcoes['Espanhol'] = st.checkbox("Espanhol", 
+                value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
+                key=f"{nome_professor}_espanhol")
+            idioma_opcoes['Alemão'] = st.checkbox("Alemão", 
+                value='Alemão' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
+                key=f"{nome_professor}_alemao")
+            idioma_opcoes['Francês'] = st.checkbox("Francês", 
+                value='Francês' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
+                key=f"{nome_professor}_frances")
+            st.markdown('</div>', unsafe_allow_html=True)
+        st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
+
+    with cols[6]:
         st.write("Módulo")
         modulo_opcoes = {}
         with st.container():
@@ -165,31 +185,8 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             modulo_opcoes['Kids'] = st.checkbox("Kids", 
                 value='Kids' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
                 key=f"{nome_professor}_kids")
-            modulo_opcoes['In-Company'] = st.checkbox("In-Company", 
-                value='In-Company' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                key=f"{nome_professor}_incompany")
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
-
-    with cols[6]:
-        st.write("Idioma")
-        idioma_opcoes = {}
-        with st.container():
-            st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-            idioma_opcoes['Inglês'] = st.checkbox("Inglês", 
-                value='Inglês' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-                key=f"{nome_professor}_ingles")
-            idioma_opcoes['Espanhol'] = st.checkbox("Espanhol", 
-                value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-                key=f"{nome_professor}_espanhol")
-            idioma_opcoes['Alemão'] = st.checkbox("Alemão", 
-                value='Alemão' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-                key=f"{nome_professor}_alemao")
-            idioma_opcoes['Francês'] = st.checkbox("Francês", 
-                value='Francês' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-                key=f"{nome_professor}_frances")
-            st.markdown('</div>', unsafe_allow_html=True)
-        st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
 
     with cols[7]:
         st.write("Observações")
