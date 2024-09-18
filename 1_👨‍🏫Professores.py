@@ -1,232 +1,108 @@
 import streamlit as st
 import pandas as pd
 import os
-import io
 from datetime import datetime
 
-# Função para carregar os dados de um arquivo CSV
+# Função para carregar dados
 def carregar_dados():
     if os.path.exists("disponibilidade.csv"):
         return pd.read_csv("disponibilidade.csv")
     else:
         return pd.DataFrame(columns=['Professor', 'Unidades', 'Carro', 'Máquinas', 'Disponibilidade', 'Módulo', 'Observações', 'Nome do Preenchendor', 'Data', 'Dominio'])
 
-# Função para salvar dados em um arquivo CSV
+# Função para salvar dados
 def salvar_dados(df):
     df.to_csv("disponibilidade.csv", index=False)
 
-# Função para deletar uma linha específica
-def deletar_linha(index):
-    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(index).reset_index(drop=True)
-    salvar_dados(st.session_state.df_disponibilidade)
-    st.success(f"Linha {index} deletada com sucesso!")
-
-# Carregar os dados salvos (se houver) ao iniciar a aplicação
+# Carregar dados na sessão
 if 'df_disponibilidade' not in st.session_state:
     st.session_state.df_disponibilidade = carregar_dados()
 
 # Título do dashboard
 st.title("Dashboard de Disponibilidade")
 
-# Coletando o nome de quem preencheu o formulário
+# Nome da pessoa que preenche o formulário
 nome_preenchedor = st.text_input("Digite seu nome:")
 
-# Coleta a data da modificação
+# Data da modificação
 data_modificacao = st.date_input("Data da modificação", value=datetime.today())
 
-# Formata a data para DD/MM/YYYY
-data_modificada_formatada = data_modificacao.strftime("%d/%m/%Y")
+# Formatação da data
+data_formatada = data_modificacao.strftime("%d/%m/%Y")
+st.write(f"Data selecionada: {data_formatada}")
 
-st.write(f"Data selecionada: {data_modificada_formatada}")
-
-# Nomes iniciais dos professores
-nomes_iniciais = ['Pessoa A']
-
-# Lista de unidades
+# Definir opções para o formulário
 unidades = ['Satélite', 'Vicentina', 'Jardim', 'Online']
+periodos = ['Manhã', 'Tarde', 'Noite', 'Sábado']
+modulos = ['Stage 1', 'VIP', 'CONVERSATION', 'MBA', 'KIDS']
 
-# Inicializa o session state se não estiver definido
-if 'disponibilidade' not in st.session_state:
-    st.session_state.disponibilidade = {nome: {} for nome in nomes_iniciais}
+# Inicializa a disponibilidade do professor
+st.subheader("Disponibilidade do Professor")
+professor = st.text_input("Nome do professor")
 
-# Tabela de disponibilidade e checkboxes por unidade
-st.subheader("Tabela de Disponibilidade:")
+with st.container():
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.write("Unidades:")
+        unidades_selecionadas = [unidade for unidade in unidades if st.checkbox(unidade, key=f"{unidade}")]
 
-# Define a largura das colunas
-col_widths = [1, 1, 1, 1, 1, 1, 1, 1, 1]
+    with col2:
+        st.write("Máquinas:")
+        maquina_notebook = st.checkbox("Notebook")
+        maquina_computador = st.checkbox("Computador")
+        maquina_nda = st.checkbox("NDA")
 
-# Adicionando CSS para melhorar a visualização
-st.markdown(
-    """
-    <style>
-    .checkbox-no-wrap {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
+    with col3:
+        st.write("Disponibilidade:")
+        disponibilidade_selecionada = [periodo for periodo in periodos if st.checkbox(periodo, key=f"{periodo}")]
+
+# Domínio e módulo
+with st.container():
+    col4, col5 = st.columns(2)
+    
+    with col4:
+        st.write("Domínio:")
+        dominio_ingles = st.checkbox("Inglês")
+        dominio_espanhol = st.checkbox("Espanhol")
+
+    with col5:
+        st.write("Módulo:")
+        modulos_selecionados = [modulo for modulo in modulos if st.checkbox(modulo, key=f"{modulo}")]
+
+# Observações
+observacoes = st.text_area("Observações")
+
+# Conversão dos dados para DataFrame
+def converter_para_dataframe():
+    data = {
+        'Professor': professor,
+        'Unidades': ", ".join(unidades_selecionadas),
+        'Carro': 'Sim' if st.checkbox("Carro disponível") else 'Não',
+        'Máquinas': ", ".join([maquina for maquina in ['Notebook', 'Computador', 'NDA'] if eval(f'maquina_{maquina.lower()}')]),
+        'Disponibilidade': ", ".join(disponibilidade_selecionada),
+        'Módulo': ", ".join(modulos_selecionados),
+        'Observações': observacoes,
+        'Nome do Preenchendor': nome_preenchedor,
+        'Data': data_formatada,
+        'Dominio': ", ".join([dom for dom in ['Inglês', 'Espanhol'] if eval(f'dominio_{dom.lower()}')])
     }
-    .dataframe {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    .dataframe th, .dataframe td {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-    .dataframe tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-    .dataframe th {
-        background-color: #4CAF50;
-        color: white;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+    return pd.DataFrame([data])
 
-for i, nome_inicial in enumerate(nomes_iniciais):
-    cols = st.columns(col_widths)
+# Botão para salvar os dados
+if st.button("Salvar"):
+    novo_df = converter_para_dataframe()
+    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, novo_df], ignore_index=True)
+    salvar_dados(st.session_state.df_disponibilidade)
+    st.success("Dados salvos com sucesso!")
 
-    with cols[0]:
-        nome_professor = st.text_input(f"Nome do professor", nome_inicial, key=f"nome_{i}")
+# Exibir dados salvos
+st.subheader("Dados Salvos")
+st.dataframe(st.session_state.df_disponibilidade)
 
-    # Atualiza o nome do professor no session state
-    if nome_professor != nome_inicial:
-        st.session_state.disponibilidade[nome_professor] = st.session_state.disponibilidade.pop(nome_inicial, {})
-
-    # Atualiza o dicionário com base no session state
-    if nome_professor not in st.session_state.disponibilidade:
-        st.session_state.disponibilidade[nome_professor] = {}
-
-    # Dividindo a tabela em duas linhas para melhorar a visualização
-    with st.container():
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            st.write("Unidades")
-            for unidade in unidades:
-                st.session_state.disponibilidade[nome_professor][unidade] = st.checkbox(f"{unidade}", 
-                    value=st.session_state.disponibilidade[nome_professor].get(unidade, False), 
-                    key=f"{nome_professor}_{unidade}")
-
-        with col2:
-            st.write("Carro")
-            st.session_state.disponibilidade[nome_professor]['Carro'] = st.checkbox("Tem carro", 
-                value=st.session_state.disponibilidade[nome_professor].get('Carro', False), 
-                key=f"{nome_professor}_carro")
-
-    with st.container():
-        col3, col4 = st.columns([2, 1])
-        with col3:
-            st.write("Máquina")
-            maquinas = {}
-            with st.container():
-                st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-                maquinas['Notebook'] = st.checkbox("Notebook", 
-                    value='Notebook' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                    key=f"{nome_professor}_notebook")
-                maquinas['Computador'] = st.checkbox("Computador", 
-                    value='Computador' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                    key=f"{nome_professor}_computador")
-                maquinas['NDA'] = st.checkbox("NDA", 
-                    value='NDA' in st.session_state.disponibilidade[nome_professor].get('Máquina', []), 
-                    key=f"{nome_professor}_nda")
-                st.markdown('</div>', unsafe_allow_html=True)
-            st.session_state.disponibilidade[nome_professor]['Máquina'] = [key for key, value in maquinas.items() if value]
-
-        with col4:
-            st.write("Disponibilidade")
-            periodos = ['Manhã', 'Tarde', 'Noite', 'Sábado']
-            disponibilidade_horarios = {}
-            with st.container():
-                st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-                for periodo in periodos:
-                    disponibilidade_horarios[periodo] = st.checkbox(periodo, 
-                        value=periodo in st.session_state.disponibilidade[nome_professor].get('Disponibilidade', []), 
-                        key=f"{nome_professor}_{periodo}")
-                st.markdown('</div>', unsafe_allow_html=True)
-            st.session_state.disponibilidade[nome_professor]['Disponibilidade'] = [key for key, value in disponibilidade_horarios.items() if value]
-
-    with st.container():
-        col5, col6 = st.columns([2, 1])
-        with col5:
-            st.write("Módulo")
-            modulo_opcoes = {}
-            with st.container():
-                st.markdown('<div class="checkbox-no-wrap">', unsafe_allow_html=True)
-                modulo_opcoes['Stage 1'] = st.checkbox("Stage 1", 
-                    value='Stage 1' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                    key=f"{nome_professor}_stage1")
-                modulo_opcoes['VIP'] = st.checkbox("VIP", 
-                    value='VIP' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                    key=f"{nome_professor}_vip")
-                modulo_opcoes['CONVERSATION'] = st.checkbox("CONVERSATION", 
-                    value='CONVERSATION' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                    key=f"{nome_professor}_conversation")
-                modulo_opcoes['MBA'] = st.checkbox("MBA", 
-                    value='MBA' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                    key=f"{nome_professor}_mba")
-                modulo_opcoes['KIDS'] = st.checkbox("KIDS", 
-                    value='KIDS' in st.session_state.disponibilidade[nome_professor].get('Modulo', []), 
-                    key=f"{nome_professor}_kids")
-                st.markdown('</div>', unsafe_allow_html=True)
-            st.session_state.disponibilidade[nome_professor]['Modulo'] = [key for key, value in modulo_opcoes.items() if value]
-
-        with col6:
-            st.write("Observações")
-            observacoes = st.text_area("Observações", 
-                value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
-                key=f"{nome_professor}_observacoes")
-            st.session_state.disponibilidade[nome_professor]['Observações'] = observacoes
-
-    with st.container():
-        col7, col8 = st.columns([2, 1])
-        with col7:
-            st.write("Domínio")
-            dominio_opcoes = {
-                'Inglês': st.checkbox("Inglês", 
-                    value='Inglês' in st.session_state.disponibilidade[nome_professor].get('Dominio', []), 
-                    key=f"{nome_professor}_ingles"),
-                'Espanhol': st.checkbox("Espanhol", 
-                    value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Dominio', []), 
-                    key=f"{nome_professor}_espanhol")
-            }
-            st.session_state.disponibilidade[nome_professor]['Dominio'] = [key for key, value in dominio_opcoes.items() if value]
-
-        with col8:
-            st.write("Nome do Preenchendor")
-            st.text(f"Nome: {nome_preenchedor}")
-            st.write(f"Data: {data_modificada_formatada}")
-
-    # Conversão dos dados para DataFrame
-    def converter_para_dataframe():
-        data = []
-        for professor, info in st.session_state.disponibilidade.items():
-            row = {
-                'Professor': professor,
-                'Unidades': ", ".join([unidade for unidade in unidades if info.get(unidade, False)]),
-                'Carro': 'Sim' if info.get('Carro', False) else 'Não',
-                'Máquinas': ", ".join(info.get('Máquina', [])),
-                'Disponibilidade': ", ".join(info.get('Disponibilidade', [])),
-                'Módulo': ", ".join(info.get('Modulo', [])),
-                'Observações': info.get('Observações', ''),
-                'Nome do Preenchendor': nome_preenchedor,
-                'Data': data_modificada_formatada,
-                'Dominio': ", ".join(info.get('Dominio', []))
-            }
-            data.append(row)
-        return pd.DataFrame(data)
-
-    # Botão para salvar os dados
-    if st.button("Salvar"):
-        df = converter_para_dataframe()
-        salvar_dados(df)
-        st.success("Dados salvos com sucesso!")
-
-    # Exibição dos dados salvos
-    st.subheader("Dados Salvos:")
-    st.write(st.session_state.df_disponibilidade)
-
-    # Deletar uma linha específica
-    if st.button("Deletar Linha"):
-        index_para_deletar = st.number_input("Número da linha a ser deletada:", min_value=0, max_value=len(st.session_state.df_disponibilidade)-1)
-        deletar_linha(index_para_deletar)
+# Opção para deletar linha
+linha_para_deletar = st.number_input("Número da linha para deletar", min_value=0, max_value=len(st.session_state.df_disponibilidade)-1, step=1)
+if st.button("Deletar Linha"):
+    st.session_state.df_disponibilidade = st.session_state.df_disponibilidade.drop(linha_para_deletar).reset_index(drop=True)
+    salvar_dados(st.session_state.df_disponibilidade)
+    st.success(f"Linha {linha_para_deletar} deletada com sucesso!")
