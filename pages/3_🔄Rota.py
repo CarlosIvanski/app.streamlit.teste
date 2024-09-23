@@ -72,7 +72,7 @@ if usuario_atual in usuarios_superadmin:
     }
     df_pre_programado = pd.DataFrame(dados_pre_programados)
 
-    if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
+if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
     st.write("Iniciando fusão...")
     with st.spinner("Processando..."):
         try:
