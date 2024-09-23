@@ -83,6 +83,11 @@ if usuario_atual in usuarios_superadmin:
                     df_turmas['Teacher'] = df_turmas['Teacher'].astype(str)
                     df_pre_programado['Professor'] = df_pre_programado['Professor'].astype(str)
 
+                    # Exibir os tipos de dados para depuração
+                    st.write("Tipos de dados antes da fusão:")
+                    st.write(df_turmas.dtypes)
+                    st.write(df_pre_programado.dtypes)
+
                     # Combinar os dados da tabela pré-programada com os dados da segunda planilha
                     df_fusao = pd.merge(df_turmas, df_pre_programado, left_on='Teacher', right_on='Professor', how='outer')
 
