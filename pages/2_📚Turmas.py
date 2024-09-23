@@ -16,12 +16,12 @@ def load_excel(uploaded_file):
 # Permitir upload de múltiplos arquivos Excel
 uploaded_files = st.file_uploader("Escolha os arquivos Excel", type=["xlsx"], accept_multiple_files=True)
 
+# Inicializar variáveis para os dois arquivos importantes
+df_professores = None
+df_turmas = None
+df_classificacoes = None
+
 if uploaded_files:
-    # Inicializar variáveis para os dois arquivos importantes
-    df_professores = None
-    df_turmas = None
-    df_classificacoes = None
-    
     for uploaded_file in uploaded_files:
         df = load_excel(uploaded_file)
         st.session_state[f'df_{uploaded_file.name}'] = df
@@ -52,16 +52,18 @@ if uploaded_files:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-    # Se todos os arquivos estiverem carregados
-    if df_professores is not None and df_turmas is not None and df_classificacoes is not None:
-        # Botão para fundir os professores na tabela de turmas e criar uma nova tabela
-        if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
-            df_fusao = df_turmas.copy()  # Criar uma cópia da tabela de turmas para a fusão
-            for i, row in df_classificacoes.iterrows():
-                if i < len(df_fusao):
-                    df_fusao.at[i, 'Teacher'] = row['Nome']  # Substituir a coluna "Teacher" com os nomes dos professores
-            
-            st.success("Fusão realizada com sucesso! Nova tabela criada.")
+# Se ambos os arquivos estiverem carregados, mostrar o botão de fusão
+if df_professores is not None and df_turmas is not None:
+    st.subheader("Realizar Fusão dos Dados")
+
+    # Botão para fundir os professores na tabela de turmas e criar uma nova tabela
+    if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
+        df_fusao = df_turmas.copy()  # Criar uma cópia da tabela de turmas para a fusão
+        for i, row in df_professores.iterrows():
+            if i < len(df_fusao):
+                df_fusao.at[i, 'Teacher'] = row['Nome']  # Substituir a coluna "Teacher" com os nomes dos professores
+        
+        st.success("Fusão realizada com sucesso! Nova tabela criada.")
         
         # Mostrar a nova tabela de fusão
         st.subheader("Tabela de Fusão (Turmas + Professores)")
@@ -69,15 +71,14 @@ if uploaded_files:
 
         # Botão para exportar a nova tabela de fusão para Excel
         st.subheader("Exportar Nova Tabela de Fusão para Excel")
-        if st.button("Exportar Nova Tabela de Fusão"):
-            buffer = io.BytesIO()
-            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-                df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
-            buffer.seek(0)
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+            df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
+        buffer.seek(0)
 
-            st.download_button(
-                label="Baixar Excel",
-                data=buffer,
-                file_name="tabela_fusao.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+        st.download_button(
+            label="Baixar Excel",
+            data=buffer,
+            file_name="tabela_fusao.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
