@@ -2,13 +2,6 @@ import streamlit as st
 import pandas as pd
 import io
 
-# Definir uma lista de usuários com permissões especiais
-usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
-
-# Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
-if nome_preenchedor in usuarios_superadmin:
-    st.subheader("teste")
-
 st.title("Rota")
 
 st.subheader('Importar dados das turmas e professores')
