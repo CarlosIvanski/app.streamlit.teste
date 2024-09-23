@@ -5,6 +5,7 @@ import io
 st.set_page_config(page_title="Turmas", layout="wide")
 
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+usuario_atual = st.text_input("Digite seu nome de usuário:", "")
 
 st.title("Rota")
 
