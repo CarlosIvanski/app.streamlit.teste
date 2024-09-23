@@ -37,5 +37,3 @@ if usuario_atual in usuarios_superadmin:
                     file_name=f"{uploaded_file.name}_editado.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-
-st.set_page_config(layout="wide")
