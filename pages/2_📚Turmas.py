@@ -16,7 +16,7 @@ data = {
 
 df = pd.DataFrame(data)
 
-st.title("Table de Turmas")
+st.title("Tabela de Turmas")
 st.dataframe(df)
 
 excel_file = "disponibilidade.xlsx"
