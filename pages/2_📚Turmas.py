@@ -54,30 +54,46 @@ st.subheader("Realizar Fusão dos Dados")
 
 # Botão para fundir os professores na tabela de turmas e criar uma nova tabela
 if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
-    df_fusao = df_turmas.copy() if df_turmas is not None else pd.DataFrame()  # Usar uma cópia ou um DataFrame vazio
-    if df_professores is not None and df_turmas is not None:
-        # Verificar se o número de linhas é compatível
-        if len(df_professores) <= len(df_turmas):
-            df_fusao['Teacher'] = df_professores['Professor'].values[:len(df_turmas)]
-        else:
-            st.warning("A tabela de professores tem mais linhas do que a tabela de turmas.")
-        
-        st.success("Fusão realizada com sucesso! Nova tabela criada.")
-        
-        # Mostrar a nova tabela de fusão
-        st.subheader("Tabela de Fusão (Turmas + Professores)")
-        st.dataframe(df_fusao)
+    if df_turmas is None or df_professores is None:
+        st.warning("Certifique-se de ter carregado os arquivos de turmas e professores.")
+    else:
+        # Mensagem de debug para confirmar que o código chegou até aqui
+        st.write("Iniciando fusão...")
 
-        # Botão para exportar a nova tabela de fusão para Excel
-        st.subheader("Exportar Nova Tabela de Fusão para Excel")
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-            df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
-        buffer.seek(0)
+        try:
+            # Verificar se as colunas essenciais existem
+            if 'Professor' not in df_professores.columns:
+                st.error('Coluna "Professor" não encontrada no arquivo de professores.')
+            elif 'Teacher' not in df_turmas.columns:
+                st.error('Coluna "Teacher" não encontrada no arquivo de turmas.')
+            else:
+                # Fazer a fusão preenchendo a coluna "Teacher" com a coluna "Professor"
+                df_fusao = df_turmas.copy()
 
-        st.download_button(
-            label="Baixar Excel",
-            data=buffer,
-            file_name="tabela_fusao.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+                # Verificar o tamanho dos dataframes
+                if len(df_professores) <= len(df_turmas):
+                    df_fusao['Teacher'] = df_professores['Professor'].values[:len(df_turmas)]
+                else:
+                    st.warning("A tabela de professores tem mais linhas do que a tabela de turmas. Apenas as primeiras serão usadas.")
+
+                st.success("Fusão realizada com sucesso! Nova tabela criada.")
+                
+                # Mostrar a nova tabela de fusão
+                st.subheader("Tabela de Fusão (Turmas + Professores)")
+                st.dataframe(df_fusao)
+
+                # Botão para exportar a nova tabela de fusão para Excel
+                buffer = io.BytesIO()
+                with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                    df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
+                buffer.seek(0)
+
+                st.download_button(
+                    label="Baixar Excel",
+                    data=buffer,
+                    file_name="tabela_fusao.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
+        except Exception as e:
+            st.error(f"Erro durante a fusão: {e}")
