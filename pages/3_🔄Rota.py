@@ -34,7 +34,7 @@ if usuario_atual in usuarios_superadmin:
             "Unidade": ["Vicentina", "Vicentina", "Vicentina", "Satélite", "Vicentina", "Jardim", "Vicentina"],
             "Dias da Semana": ["3ª ● 5ª", "2ª ● 4ª", "3ª", "4ª", "6ª", "4ª", "6ª"],
             "Stage": ["#REF!", "#REF!", "#REF!", "#REF!", "#REF!", "#REF!", "#REF!"],
-            "Livro": ["", "", "", "", "", "", "", "", ""],
+            "Livro": ["", "", "", "", "", "", ""],
             "MOD": ["CONV", "CONV", "CONV - INICIANTE", "CONV - INTERMEDIÁRIO", "CONV - INTERMEDIÁRIO", "CONV - INTERMEDIÁRIO", "CONV - INTERMEDIÁRIO"],
             "N Aula": ["2", "2", "1", "1", "1", "1", "1"],
             "PARAG ATUAL": ["#REF!", "#REF!", "#REF!", "#REF!", "#REF!", "#REF!", "#REF!"],
