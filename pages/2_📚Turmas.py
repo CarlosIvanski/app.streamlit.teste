@@ -43,7 +43,7 @@ if usuario_atual in usuarios_superadmin:
             st.download_button(
                 label="Baixar tabela editada",
                 data=buffer,
-                file_name="tabela_editada.xlsx",
+                file_name="Turmas.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
