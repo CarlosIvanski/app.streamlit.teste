@@ -2,16 +2,13 @@ import streamlit as st
 import pandas as pd
 import io
 
-# Lista de superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
 
-# Título da aplicação
-st.title("Acesso ao Dashboard")
 
-# Campo para o usuário inserir seu nome
+st.title("Acesso ao Dashboard da Rota")
+
 usuario_atual = st.text_input("Digite seu nome de usuário:")
 
-# Verificação de acesso
 if usuario_atual in usuarios_superadmin:
     st.success("Acesso autorizado! Bem-vindo ao dashboard.")
 
