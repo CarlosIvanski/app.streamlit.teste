@@ -225,16 +225,15 @@ if 'save_button_clicked' not in st.session_state:
 
 # Botão para salvar os dados na tabela em tempo real
 if st.button("Salvar dados"):
-    # Somente salvar se o botão for pressionado
+    st.session_state.save_button_clicked = True
+
+# Somente salva os dados se o botão foi clicado
+if st.session_state.save_button_clicked:
     df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
-    
-    # Concatenar os dados novos sem duplicar ou sobrescrever os anteriores
     st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
-    
-    # Salvar no CSV apenas após o clique
     salvar_dados(st.session_state.df_disponibilidade)
-    
     st.success("Dados salvos com sucesso!")
+    st.session_state.save_button_clicked = False  # Reseta o estado do botão
 
 # Definir uma lista de usuários com permissões especiais
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
