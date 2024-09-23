@@ -58,7 +58,7 @@ def read_file(file_path):
         return file.read()
 
 # Especificar o caminho para o arquivo Excel existente
-file_path = 'TURMAS.xlsx'
+file_path = 'pages/TURMAS.xlsx'
 
 # Ler o conteúdo do arquivo
 excel_data = read_file(file_path)
