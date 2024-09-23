@@ -49,6 +49,3 @@ if usuario_atual in usuarios_superadmin:
 
     elif uploaded_file:
         st.warning("Você não tem permissão para fazer upload deste arquivo.")
-
-# Configuração da página
-st.set_page_config(layout="wide")
