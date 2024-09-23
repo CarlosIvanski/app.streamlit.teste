@@ -3,6 +3,8 @@ import pandas as pd
 
 st.set_page_config(layout="wide")
 
+uploaded_files = st.file_uploader("Escolha os arquivos Excel", type=["xlsx"], accept_multiple_files=True)
+
 data = {
     "Grupo": ["Abu Dhabi Online", "Auckland Presencial", "Botswana Online", "Brooklyn Presencial", "Chicago Presencial", "Connecticut Presencial"],
     "Horário": ["19:00", "19:00", "19:00", "19:00", "19:00", "19:00"],
