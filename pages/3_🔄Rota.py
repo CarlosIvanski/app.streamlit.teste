@@ -51,4 +51,3 @@ if usuario_atual in usuarios_superadmin:
 
 else:
     st.warning("Você não tem permissão para acessar este dashboard. Por favor, insira um nome de usuário autorizado.")
-s
