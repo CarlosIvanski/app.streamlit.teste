@@ -38,17 +38,4 @@ if usuario_atual in usuarios_superadmin:
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
 
-    df = pd.DataFrame(data)
-
-    st.title("Tabela de Turmas")
-    st.dataframe(df)
-
-    excel_file = "disponibilidade.xlsx"
-    df.to_excel(excel_file, index=False)
-
-    st.download_button(
-        label="Baixar tabela como Excel",
-        data=open(excel_file, "rb").read(),
-        file_name="TURMAS.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+st.set_page_config(layout="wide")
