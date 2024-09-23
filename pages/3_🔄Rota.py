@@ -4,6 +4,8 @@ import io
 
 st.set_page_config(page_title="Turmas", layout="wide")
 
+usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+
 st.title("Rota")
 
 st.subheader('Importar dados das turmas e professores')
