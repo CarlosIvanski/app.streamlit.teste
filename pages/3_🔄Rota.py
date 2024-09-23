@@ -4,7 +4,6 @@ import io
 
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
 
-
 st.title("Acesso ao Dashboard da Rota")
 
 usuario_atual = st.text_input("Digite seu nome de usuário:")
@@ -65,10 +64,16 @@ if usuario_atual in usuarios_superadmin:
                     else:
                         df_fusao = df_turmas.copy()
 
-                        if len(df_professores) <= len(df_turmas):
-                            df_fusao['Unnamed: 10'] = df_professores['Professor'].values[:len(df_turmas)]
+                        # Ajustar o número de linhas na fusão
+                        n_professores = len(df_professores)
+                        n_turmas = len(df_turmas)
+
+                        if n_professores < n_turmas:
+                            # Preencher somente até o número de professores disponíveis
+                            df_fusao['Unnamed: 10'] = pd.Series(df_professores['Professor'].values)
                         else:
-                            st.warning("A tabela de professores tem mais linhas do que a tabela de turmas. Apenas as primeiras serão usadas.")
+                            # Se houver mais professores do que turmas, use apenas os primeiros
+                            df_fusao['Unnamed: 10'] = df_professores['Professor'].values[:n_turmas]
 
                         st.success("Fusão realizada com sucesso! Nova tabela criada.")
                         
