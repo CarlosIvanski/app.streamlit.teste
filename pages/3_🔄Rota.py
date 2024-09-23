@@ -8,8 +8,6 @@ usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDireto
 # Simulação de um usuário logado (isso deve ser substituído pela sua lógica de autenticação)
 usuario_atual = st.text_input("Digite seu nome de usuário:", "")
 
-st.set_page_config(page_title="Turmas", layout="wide")
-
 st.title("Rota")
 
 st.subheader('Importar dados das turmas e professores')
