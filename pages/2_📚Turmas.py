@@ -3,7 +3,7 @@ import pandas as pd
 import io
 
 st.set_page_config(
-    page_title="Turmas",
+    page_title="Turmas", layout="wide"
 )
 
 st.title("Detalhes das Turmas")
