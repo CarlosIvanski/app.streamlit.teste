@@ -4,6 +4,7 @@ import io
 
 # Lista de usuários superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+usuario_permitido = "usuario_especifico"  # Substitua pelo nome do usuário permitido para upload
 
 # Input do usuário
 usuario_atual = st.text_input("Digite seu nome de usuário:")
@@ -15,25 +16,39 @@ if usuario_atual in usuarios_superadmin:
         df = pd.read_excel(uploaded_file)
         return df
 
-    uploaded_files = st.file_uploader("Escolha os arquivos Excel", type=["xlsx"], accept_multiple_files=True)
+    uploaded_file = st.file_uploader("Escolha um arquivo Excel", type=["xlsx"])
 
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            df = load_excel(uploaded_file)
-            st.session_state[f'df_{uploaded_file.name}'] = df
-            st.success(f'Arquivo {uploaded_file.name} carregado com sucesso!')
+    if uploaded_file and usuario_atual == usuario_permitido:
+        df = load_excel(uploaded_file)
+        st.session_state['df_upload'] = df
+        st.success(f'Arquivo {uploaded_file.name} carregado com sucesso!')
 
-            df_editable = st.data_editor(df, use_container_width=True)
-            st.session_state[f'df_{uploaded_file.name}'] = df_editable
+        # Exibir a tabela carregada
+        df_editable = st.data_editor(df, use_container_width=True)
+        st.session_state['df_upload'] = df_editable
 
-            if st.button(f"Exportar {uploaded_file.name} para Excel"):
-                buffer = io.BytesIO()
-                with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-                    df_editable.to_excel(writer, index=False, sheet_name='Dados Editados')
-                buffer.seek(0)
-                st.download_button(
-                    label=f"Baixar {uploaded_file.name} editado",
-                    data=buffer,
-                    file_name=f"{uploaded_file.name}_editado.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+        if st.button("Exportar tabela editada para Excel"):
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                df_editable.to_excel(writer, index=False, sheet_name='Dados Editados')
+            buffer.seek(0)
+            st.download_button(
+                label="Baixar tabela editada",
+                data=buffer,
+                file_name="tabela_editada.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
+        # Botão para deletar a tabela
+        if st.button("Deletar tabela"):
+            if 'df_upload' in st.session_state:
+                del st.session_state['df_upload']
+                st.success("Tabela deletada com sucesso!")
+            else:
+                st.warning("Nenhuma tabela para deletar.")
+
+    elif uploaded_file:
+        st.warning("Você não tem permissão para fazer upload deste arquivo.")
+
+# Configuração da página
+st.set_page_config(layout="wide")
