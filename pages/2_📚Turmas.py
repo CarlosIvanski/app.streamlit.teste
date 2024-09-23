@@ -22,6 +22,6 @@ df.to_excel(excel_file, index=False)
 st.download_button(
     label="Baixar tabela como Excel",
     data=open(excel_file, "rb").read(),
-    file_name=excel_file,
+    file_name=TURMAS,
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
