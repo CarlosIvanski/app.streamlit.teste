@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import io
+import os
 
 # Lista de usuários superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
