@@ -222,11 +222,7 @@ df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenc
 # Adiciona uma variável no session_state para controlar o salvamento
 if 'save_button_clicked' not in st.session_state:
     st.session_state.save_button_clicked = False
-
-# Botão para salvar os dados na tabela em tempo real
-if st.button("Salvar dados"):
-    st.session_state.save_button_clicked = True
-
+    
 # Somente salva os dados se o botão foi clicado
 if st.session_state.save_button_clicked:
     df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
