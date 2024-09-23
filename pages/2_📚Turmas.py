@@ -2,9 +2,12 @@ import streamlit as st
 import pandas as pd
 import io
 
+st.set_page_config(layout="wide")
+
+
 # Lista de usuários superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
-usuario_permitido = "BrunoMorgilloCoordenadorSUPERADMIN_123456"  # Substitua pelo nome do usuário permitido para upload
+usuario_permitido = "usuario_especifico"  # Substitua pelo nome do usuário permitido para upload
 
 # Input do usuário
 usuario_atual = st.text_input("Digite seu nome de usuário:")
@@ -16,6 +19,10 @@ if usuario_atual in usuarios_superadmin:
         df = pd.read_excel(uploaded_file)
         return df
 
+    # Verifica se a tabela já foi carregada
+    if 'df_upload' not in st.session_state:
+        st.session_state['df_upload'] = None
+
     uploaded_file = st.file_uploader("Escolha um arquivo Excel", type=["xlsx"])
 
     if uploaded_file and usuario_atual == usuario_permitido:
@@ -23,8 +30,9 @@ if usuario_atual in usuarios_superadmin:
         st.session_state['df_upload'] = df
         st.success(f'Arquivo {uploaded_file.name} carregado com sucesso!')
 
-        # Exibir a tabela carregada
-        df_editable = st.data_editor(df, use_container_width=True)
+    # Exibir a tabela carregada, se existir
+    if st.session_state['df_upload'] is not None:
+        df_editable = st.data_editor(st.session_state['df_upload'], use_container_width=True)
         st.session_state['df_upload'] = df_editable
 
         if st.button("Exportar tabela editada para Excel"):
@@ -41,11 +49,8 @@ if usuario_atual in usuarios_superadmin:
 
         # Botão para deletar a tabela
         if st.button("Deletar tabela"):
-            if 'df_upload' in st.session_state:
-                del st.session_state['df_upload']
-                st.success("Tabela deletada com sucesso!")
-            else:
-                st.warning("Nenhuma tabela para deletar.")
+            del st.session_state['df_upload']
+            st.success("Tabela deletada com sucesso!")
 
     elif uploaded_file:
         st.warning("Você não tem permissão para fazer upload deste arquivo.")
