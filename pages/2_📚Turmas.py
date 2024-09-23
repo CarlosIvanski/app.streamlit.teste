@@ -1,45 +1,42 @@
 import streamlit as st
 import pandas as pd
 import io
+from time import sleep
 
-st.set_page_config(
-    page_title="Turmas", layout="wide"
-)
+st.set_page_config(page_title="Turmas", layout="wide")
 
 st.title("Detalhes das Turmas")
-
 st.subheader('Importar dados das turmas')
 
-# Função para carregar arquivo Excel
+# Função para carregar arquivo Excel com indicador de progresso
 def load_excel(uploaded_file):
-    df = pd.read_excel(uploaded_file)
+    with st.spinner("Carregando arquivo..."):
+        df = pd.read_excel(uploaded_file)
+        sleep(1)  # Simulação de tempo de carregamento
     return df
 
-# Carregar arquivo Excel
-uploaded_file = st.file_uploader("Escolha um arquivo Excel", type=["xlsx"])
+# Permitir upload de múltiplos arquivos Excel
+uploaded_files = st.file_uploader("Escolha os arquivos Excel", type=["xlsx"], accept_multiple_files=True)
 
-# Carregar os dados do Excel para o st.session_state apenas uma vez
-if uploaded_file is not None and 'df' not in st.session_state:
-    st.session_state.df = load_excel(uploaded_file)
-    st.success('Arquivo carregado com sucesso!')
-
-    # Mostrar os dados carregados em uma tabela editável
-    df_editable = st.data_editor(st.session_state.df, use_container_width=True)
-    
-    # Atualizar o DataFrame na sessão após a edição
-    st.session_state.df = df_editable
-
-    # Botão para exportar os dados editados para Excel
-    st.subheader("Exportar Dados Editados para Excel")
-    if st.button("Exportar para Excel"):
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-            st.session_state.df.to_excel(writer, index=False, sheet_name='Dados Editados')
-        buffer.seek(0)
+if uploaded_files:
+    for uploaded_file in uploaded_files:
+        df = load_excel(uploaded_file)
+        st.session_state[f'df_{uploaded_file.name}'] = df
+        st.success(f'Arquivo {uploaded_file.name} carregado com sucesso!')
         
-        st.download_button(
-            label="Baixar Excel",
-            data=buffer,
-            file_name="dados_editados.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        # Mostrar os dados carregados em uma tabela editável
+        df_editable = st.data_editor(df, use_container_width=True)
+        st.session_state[f'df_{uploaded_file.name}'] = df_editable
+
+        # Botão para exportar os dados editados para Excel
+        if st.button(f"Exportar {uploaded_file.name} para Excel"):
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                df_editable.to_excel(writer, index=False, sheet_name='Dados Editados')
+            buffer.seek(0)
+            st.download_button(
+                label=f"Baixar {uploaded_file.name} editado",
+                data=buffer,
+                file_name=f"{uploaded_file.name}_editado.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
