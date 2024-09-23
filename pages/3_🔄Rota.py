@@ -51,3 +51,22 @@ if usuario_atual in usuarios_superadmin:
 
 else:
     st.warning("Você não tem permissão para acessar este dashboard. Por favor, insira um nome de usuário autorizado.")
+
+# Função para ler o arquivo existente
+def read_file(file_path):
+    with open(file_path, "rb") as file:
+        return file.read()
+
+# Especificar o caminho para o arquivo Excel existente
+file_path = 'C:\Users\losbr\Documents\Allan é lindo\app.streamlit.teste\TURMAS.xlsx'
+
+# Ler o conteúdo do arquivo
+excel_data = read_file(file_path)
+
+# Botão de download para o arquivo Excel existente
+st.download_button(
+    label="Baixar exemplo.xlsx",
+    data=excel_data,
+    file_name='TURMAS_final.xlsx',
+    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+)
