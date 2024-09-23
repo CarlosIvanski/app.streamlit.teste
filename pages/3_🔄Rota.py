@@ -17,15 +17,12 @@ if usuario_atual in usuarios_superadmin:
     if st.button("Clique aqui para armazenar dados"):
         st.success("Dados armazenados lidos com sucesso!")
 
-    # Dados do arquivo Excel pré-implementado
-    excel_data = {
-        "Coluna 1": ["Dado 1", "Dado 2", "Dado 3"],
-        "Coluna 2": ["Valor 1", "Valor 2", "Valor 3"]
-    }
-    
-    # Armazenar o DataFrame no session state
+    # Carregar o arquivo Excel
     if 'df_oculto' not in st.session_state:
-        st.session_state.df_oculto = pd.DataFrame(excel_data)
+        try:
+            st.session_state.df_oculto = pd.read_excel("dados.xlsx")  # Substitua pelo caminho do seu arquivo
+        except Exception as e:
+            st.error(f"Erro ao carregar o arquivo Excel: {e}")
 
     # Botão para exibir a tabela do Excel
     if st.button("Mostrar dados gerenciáveis"):
