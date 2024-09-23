@@ -1,13 +1,14 @@
 import streamlit as st
 import pandas as pd
 import io
+import os
 
-# Configuração da página
 st.set_page_config(layout="wide")
 
 # Lista de usuários superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
 usuario_permitido = "BrunoMorgilloCoordenadorSUPERADMIN_123456"  # Substitua pelo nome do usuário permitido para upload
+csv_file_path = 'tabela_dados.csv'  # Caminho do arquivo CSV
 
 # Input do usuário
 usuario_atual = st.text_input("Digite seu nome de usuário:")
@@ -19,8 +20,10 @@ if usuario_atual in usuarios_superadmin:
         df = pd.read_excel(uploaded_file)
         return df
 
-    # Verifica se a tabela já foi carregada
-    if 'df_upload' not in st.session_state:
+    # Verifica se o arquivo CSV existe e carrega os dados
+    if os.path.exists(csv_file_path):
+        st.session_state['df_upload'] = pd.read_csv(csv_file_path)
+    else:
         st.session_state['df_upload'] = None
 
     uploaded_file = st.file_uploader("Escolha um arquivo Excel", type=["xlsx"])
@@ -28,6 +31,7 @@ if usuario_atual in usuarios_superadmin:
     if uploaded_file and usuario_atual == usuario_permitido:
         df = load_excel(uploaded_file)
         st.session_state['df_upload'] = df
+        df.to_csv(csv_file_path, index=False)  # Salva os dados no CSV
         st.success(f'Arquivo {uploaded_file.name} carregado com sucesso!')
 
     # Exibir a tabela carregada, se existir
@@ -43,13 +47,15 @@ if usuario_atual in usuarios_superadmin:
             st.download_button(
                 label="Baixar tabela editada",
                 data=buffer,
-                file_name="Turmas.xlsx",
+                file_name="tabela_editada.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
         # Botão para deletar a tabela
         if st.button("Deletar tabela"):
-            del st.session_state['df_upload']
+            if os.path.exists(csv_file_path):
+                os.remove(csv_file_path)
+            st.session_state['df_upload'] = None
             st.success("Tabela deletada com sucesso!")
 
     elif uploaded_file:
