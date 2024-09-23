@@ -1,5 +1,3 @@
-encaixa nesse meu codigo fazendo as alterações e remoções necessarias
-
 import streamlit as st
 import pandas as pd
 import io
