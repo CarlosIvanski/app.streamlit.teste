@@ -4,7 +4,7 @@ import io
 
 st.set_page_config(page_title="Turmas", layout="wide")
 
-st.title("Detalhes das Turmas")
+st.title("Rota")
 
 st.subheader('Importar dados das turmas e professores')
 
