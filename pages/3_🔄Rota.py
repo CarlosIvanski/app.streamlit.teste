@@ -2,10 +2,13 @@ import streamlit as st
 import pandas as pd
 import io
 
-st.set_page_config(page_title="Turmas", layout="wide")
-
+# Lista de superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+
+# Simulação de um usuário logado (isso deve ser substituído pela sua lógica de autenticação)
 usuario_atual = st.text_input("Digite seu nome de usuário:", "")
+
+st.set_page_config(page_title="Turmas", layout="wide")
 
 st.title("Rota")
 
@@ -53,36 +56,48 @@ if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
         st.warning("Certifique-se de ter carregado os arquivos de turmas e professores.")
     else:
         st.write("Iniciando fusão...")
-
-        try:
-            if 'Professor' not in df_professores.columns:
-                st.error('Coluna "Professor" não encontrada no arquivo de professores.')
-            elif 'Teacher' not in df_turmas.columns:
-                st.error('Coluna "Teacher" não encontrada no arquivo de turmas.')
-            else:
-                df_fusao = df_turmas.copy()
-
-                if len(df_professores) <= len(df_turmas):
-                    df_fusao['Teacher'] = df_professores['Professor'].values[:len(df_turmas)]
+        with st.spinner("Processando..."):
+            try:
+                if 'Professor' not in df_professores.columns:
+                    st.error('Coluna "Professor" não encontrada no arquivo de professores.')
+                elif 'Teacher' not in df_turmas.columns:
+                    st.error('Coluna "Teacher" não encontrada no arquivo de turmas.')
                 else:
-                    st.warning("A tabela de professores tem mais linhas do que a tabela de turmas. Apenas as primeiras serão usadas.")
+                    df_fusao = df_turmas.copy()
 
-                st.success("Fusão realizada com sucesso! Nova tabela criada.")
-                
-                st.subheader("Tabela de Fusão (Turmas + Professores)")
-                st.dataframe(df_fusao)
+                    if len(df_professores) <= len(df_turmas):
+                        df_fusao['Teacher'] = df_professores['Professor'].values[:len(df_turmas)]
+                    else:
+                        st.warning("A tabela de professores tem mais linhas do que a tabela de turmas. Apenas as primeiras serão usadas.")
 
-                buffer = io.BytesIO()
-                with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-                    df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
-                buffer.seek(0)
+                    st.success("Fusão realizada com sucesso! Nova tabela criada.")
+                    
+                    st.subheader("Tabela de Fusão (Turmas + Professores)")
+                    st.dataframe(df_fusao)
 
-                st.download_button(
-                    label="Baixar Excel",
-                    data=buffer,
-                    file_name="tabela_fusao.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+                    buffer = io.BytesIO()
+                    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                        df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
+                    buffer.seek(0)
 
-        except Exception as e:
-            st.error(f"Erro durante a fusão: {e}")
+                    st.download_button(
+                        label="Baixar Excel",
+                        data=buffer,
+                        file_name="tabela_fusao.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+
+            except Exception as e:
+                st.error(f"Erro durante a fusão: {e}")
+
+# Exibir dados apenas para superadministradores
+if usuario_atual in usuarios_superadmin:
+    st.subheader("Dados para Superadministradores")
+    st.write("Aqui estão os dados sensíveis que apenas superadministradores podem ver.")
+    # Exibir os dados que você deseja mostrar
+    if df_professores is not None:
+        st.dataframe(df_professores)
+    if df_turmas is not None:
+        st.dataframe(df_turmas)
+else:
+    st.warning("Você não tem permissão para ver esses dados.")
