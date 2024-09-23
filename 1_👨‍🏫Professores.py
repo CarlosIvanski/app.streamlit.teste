@@ -197,6 +197,7 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             key=f"{nome_professor}_observacoes")
 
 # Função para converter os dados para DataFrame
+# Função para converter os dados para DataFrame
 def converter_para_dataframe(dados, nome_usuario, data):
     registros = []
     for professor, detalhes in dados.items():
@@ -207,6 +208,7 @@ def converter_para_dataframe(dados, nome_usuario, data):
             'Máquinas': ', '.join(detalhes['Máquina']),
             'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
             'Módulo': ', '.join(detalhes['Modulo']),
+            'Idioma': ', '.join(detalhes.get('Idioma', [])),  # Adicionando a coluna de Idioma
             'Observações': detalhes.get('Observações', ''),
             'Nome do Preenchendor': nome_usuario,
             'Data': data.strftime('%Y-%m-%d')  # Garantindo que a data seja formatada sem hora
