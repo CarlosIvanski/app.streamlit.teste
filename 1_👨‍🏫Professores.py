@@ -51,10 +51,6 @@ unidades = ['Satélite', 'Vicentina', 'Jardim', 'Online']
 if 'disponibilidade' not in st.session_state:
     st.session_state.disponibilidade = {nome: {} for nome in nomes_iniciais}
 
-# Variável para controlar o salvamento
-if 'save_button_clicked' not in st.session_state:
-    st.session_state.save_button_clicked = False
-
 # Tabela de disponibilidade e checkboxes por unidade
 st.subheader("Tabela de Disponibilidade:")
 
@@ -192,57 +188,59 @@ for i, nome_inicial in enumerate(nomes_iniciais):
             idioma_opcoes['Espanhol'] = st.checkbox("Espanhol", 
                 value='Espanhol' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
                 key=f"{nome_professor}_espanhol")
-            idioma_opcoes['Outro'] = st.checkbox("Outro", 
-                value='Outro' in st.session_state.disponibilidade[nome_professor].get('Idioma', []), 
-                key=f"{nome_professor}_outro")
             st.markdown('</div>', unsafe_allow_html=True)
         st.session_state.disponibilidade[nome_professor]['Idioma'] = [key for key, value in idioma_opcoes.items() if value]
 
     with cols2[3]:
-        st.write("Observações")
-        st.session_state.disponibilidade[nome_professor]['Observações'] = st.text_area("Observações:", 
+        st.session_state.disponibilidade[nome_professor]['Observações'] = st.text_area("Observações", 
             value=st.session_state.disponibilidade[nome_professor].get('Observações', ''), 
             key=f"{nome_professor}_observacoes")
 
-# Botão para salvar os dados no CSV
-if st.button("Salvar Disponibilidade"):
-    if nome_preenchedor:
-        # Converte os dados do session state em um DataFrame
-        dados_df = pd.DataFrame([
-            {
-                'Professor': nome_professor,
-                'Unidades': ', '.join([unidade for unidade in unidades if st.session_state.disponibilidade[nome_professor].get(unidade, False)]),
-                'Carro': 'Sim' if st.session_state.disponibilidade[nome_professor].get('Carro', False) else 'Não',
-                'Máquinas': ', '.join(st.session_state.disponibilidade[nome_professor].get('Máquina', [])),
-                'Disponibilidade': ', '.join(st.session_state.disponibilidade[nome_professor].get('Disponibilidade', [])),
-                'Módulo': ', '.join(st.session_state.disponibilidade[nome_professor].get('Modulo', [])),
-                'Idioma': ', '.join(st.session_state.disponibilidade[nome_professor].get('Idioma', [])),
-                'Observações': st.session_state.disponibilidade[nome_professor].get('Observações', ''),
-                'Nome do Preenchendor': nome_preenchedor,
-                'Data': data_modificada_formatada
-            }
-        ])
+# Função para converter os dados para DataFrame
+# Função para converter os dados para DataFrame
+def converter_para_dataframe(dados, nome_usuario, data):
+    registros = []
+    for professor, detalhes in dados.items():
+        registro = {
+            'Professor': professor,
+            'Unidades': ', '.join([unidade for unidade, selecionado in detalhes.items() if unidade in unidades and selecionado]),
+            'Carro': 'Sim' if detalhes.get('Carro', False) else 'Não',
+            'Máquinas': ', '.join(detalhes['Máquina']),
+            'Disponibilidade': ', '.join(detalhes['Disponibilidade']),
+            'Módulo': ', '.join(detalhes['Modulo']),
+            'Idioma': ', '.join(detalhes.get('Idioma', [])),  # Adicionando a coluna de Idioma
+            'Observações': detalhes.get('Observações', ''),
+            'Nome do Preenchendor': nome_usuario,
+            'Data': data.strftime('%Y-%m-%d')  # Garantindo que a data seja formatada sem hora
+        }
+        registros.append(registro)
+    return pd.DataFrame(registros)
+
+# Converter os dados coletados para um DataFrame
+df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
+
+# Botão para salvar os dados na tabela em tempo real
+if st.button("Salvar dados"):
+    st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
+    salvar_dados(st.session_state.df_disponibilidade)
+    st.success("Dados salvos com sucesso!")
+
+# Definir uma lista de usuários com permissões especiais
+usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
+
+# Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
+if nome_preenchedor in usuarios_superadmin:
+    st.subheader("Tabela Atualizada de Disponibilidade")
+
+    # Iterar sobre as linhas do DataFrame e exibir as informações com botões de deletar
+    for i, row in st.session_state.df_disponibilidade.iterrows():
+        cols = st.columns(len(row) + 1)  # +1 para o botão de deletar
+        for j, value in enumerate(row):
+            cols[j].write(value)
         
-        # Atualiza o DataFrame existente com os novos dados
-        st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, dados_df], ignore_index=True)
-
-        # Salva os dados no CSV
-        salvar_dados(st.session_state.df_disponibilidade)
-
-        # Mensagem de sucesso
-        st.success("Dados salvos com sucesso!")
-    else:
-        st.error("Por favor, preencha o campo 'Nome do Preenchendor'.")
-
-# Exibe os dados em formato de tabela
-st.subheader("Disponibilidade selecionada")
-st.write("Abaixo estão os dados salvos:")
-st.write(st.session_state.df_disponibilidade)
-
-# Adiciona uma opção para deletar uma linha da tabela
-index_to_delete = st.number_input("Digite o índice da linha que deseja deletar", min_value=0, max_value=len(st.session_state.df_disponibilidade)-1, step=1)
-if st.button("Deletar Linha"):
-    deletar_linha(index_to_delete)
+        # Exibir o botão de deletar apenas se o nome do preenchedor estiver na lista de permissões
+        if cols[len(row)].button("Deletar", key=f"delete_{i}"):
+            deletar_linha(i)
 
     # Botão para exportar os dados para Excel, visível para todos os usuários na lista de permissões especiais
     st.subheader("Exportar Dados para Excel")
