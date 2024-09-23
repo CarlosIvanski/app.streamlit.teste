@@ -19,7 +19,6 @@ uploaded_files = st.file_uploader("Escolha os arquivos Excel", type=["xlsx"], ac
 # Inicializar variáveis para os dois arquivos importantes
 df_professores = None
 df_turmas = None
-df_classificacoes = None
 
 if uploaded_files:
     for uploaded_file in uploaded_files:
@@ -31,13 +30,11 @@ if uploaded_files:
         df_editable = st.data_editor(df, use_container_width=True)
         st.session_state[f'df_{uploaded_file.name}'] = df_editable
 
-        # Identificar qual arquivo é de professores, turmas e classificações
+        # Identificar qual arquivo é de professores e qual é de turmas
         if 'professores' in uploaded_file.name.lower():
             df_professores = df_editable
         elif 'turmas' in uploaded_file.name.lower():
             df_turmas = df_editable
-        elif 'classificacoes' in uploaded_file.name.lower():
-            df_classificacoes = df_editable
 
         # Botão para exportar os dados editados para Excel
         if st.button(f"Exportar {uploaded_file.name} para Excel"):
@@ -58,10 +55,12 @@ st.subheader("Realizar Fusão dos Dados")
 # Botão para fundir os professores na tabela de turmas e criar uma nova tabela
 if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
     df_fusao = df_turmas.copy() if df_turmas is not None else pd.DataFrame()  # Usar uma cópia ou um DataFrame vazio
-    if df_professores is not None:
-        for i, row in df_professores.iterrows():
-            if i < len(df_fusao):
-                df_fusao.at[i, 'Teacher'] = row['Nome']  # Substituir a coluna "Teacher" com os nomes dos professores
+    if df_professores is not None and df_turmas is not None:
+        # Verificar se o número de linhas é compatível
+        if len(df_professores) <= len(df_turmas):
+            df_fusao['Teacher'] = df_professores['Professor'].values[:len(df_turmas)]
+        else:
+            st.warning("A tabela de professores tem mais linhas do que a tabela de turmas.")
         
         st.success("Fusão realizada com sucesso! Nova tabela criada.")
         
