@@ -51,3 +51,15 @@ if usuario_atual in usuarios_superadmin:
 
 else:
     st.warning("Você não tem permissão para acessar este dashboard. Por favor, insira um nome de usuário autorizado.")
+
+        if st.button("Exportar tabela editada para Excel"):
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                df_editable.to_excel(writer, index=False, sheet_name='Dados Editados')
+            buffer.seek(0)
+            st.download_button(
+                label="Baixar tabela editada",
+                data=buffer,
+                file_name="tabela_editada.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
