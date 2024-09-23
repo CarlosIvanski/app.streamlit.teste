@@ -73,14 +73,18 @@ if usuario_atual in usuarios_superadmin:
     df_pre_programado = pd.DataFrame(dados_pre_programados)
 
     if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
-        st.write("Iniciando fusão...")
-        with st.spinner("Processando..."):
-            try:
-                # Usando o DataFrame pré-programado
-                df_fusao = df_pre_programado.copy()
+    st.write("Iniciando fusão...")
+    with st.spinner("Processando..."):
+        try:
+            # Verificando se ambos os DataFrames foram carregados
+            if df_professores is not None and df_turmas is not None:
+                # Presumindo que a coluna de professores na primeira tabela seja 'Professor'
+                df_fusao = df_turmas.copy()
 
-                # Alocar a coluna "Teacher" da tabela de fusão
-                df_fusao['Teacher'] = df_fusao['Professor']
+                # Realizando a fusão com base na coluna que une as duas tabelas
+                df_fusao = df_fusao.merge(df_professores[['Professor']], left_on='Grupo', right_on='Professor', how='left')
+
+                # Se houver outras colunas a serem puxadas de df_professores, adicione-as aqui
 
                 st.success("Fusão realizada com sucesso! Nova tabela criada.")
                 
@@ -98,9 +102,8 @@ if usuario_atual in usuarios_superadmin:
                     file_name="tabela_fusao.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
+            else:
+                st.error("Por favor, carregue ambas as tabelas antes de realizar a fusão.")
 
-            except Exception as e:
-                st.error(f"Erro durante a fusão: {e}")
-
-else:
-    st.warning("Você não tem permissão para acessar este dashboard. Por favor, insira um nome de usuário autorizado.")
+        except Exception as e:
+            st.error(f"Erro durante a fusão: {e}")
