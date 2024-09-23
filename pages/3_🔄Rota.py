@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import io
 
 # Lista de usuários superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
@@ -18,17 +17,20 @@ if usuario_atual in usuarios_superadmin:
     if st.button("Clique aqui para armazenar dados"):
         st.success("Dados armazenados lidos com sucesso!")
 
-    # Placeholder para o arquivo Excel pré-implementado
+    # Dados do arquivo Excel pré-implementado
     excel_data = {
         "Coluna 1": ["Dado 1", "Dado 2", "Dado 3"],
         "Coluna 2": ["Valor 1", "Valor 2", "Valor 3"]
     }
-    df_oculto = pd.DataFrame(excel_data)
+    
+    # Armazenar o DataFrame no session state
+    if 'df_oculto' not in st.session_state:
+        st.session_state.df_oculto = pd.DataFrame(excel_data)
 
     # Botão para exibir a tabela do Excel
     if st.button("Mostrar dados gerenciáveis"):
         st.subheader("Tabela de Dados")
-        st.dataframe(df_oculto)
+        st.dataframe(st.session_state.df_oculto)
 
 else:
     st.warning("Você não tem permissão para acessar este dashboard. Por favor, insira um nome de usuário autorizado.")
