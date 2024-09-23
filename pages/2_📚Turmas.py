@@ -57,8 +57,8 @@ st.subheader("Realizar Fusão dos Dados")
 
 # Botão para fundir os professores na tabela de turmas e criar uma nova tabela
 if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
-    if df_professores is not None and df_turmas is not None:
-        df_fusao = df_turmas.copy()  # Criar uma cópia da tabela de turmas para a fusão
+    df_fusao = df_turmas.copy() if df_turmas is not None else pd.DataFrame()  # Usar uma cópia ou um DataFrame vazio
+    if df_professores is not None:
         for i, row in df_professores.iterrows():
             if i < len(df_fusao):
                 df_fusao.at[i, 'Teacher'] = row['Nome']  # Substituir a coluna "Teacher" com os nomes dos professores
@@ -82,5 +82,3 @@ if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
             file_name="tabela_fusao.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
-    else:
-        st.warning("Carregue os arquivos de professores e turmas para realizar a fusão.")
