@@ -2,11 +2,12 @@ import streamlit as st
 import pandas as pd
 import io
 
-# Lista de superadministradores
+# Definir uma lista de usuários com permissões especiais
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
 
-# Simulação de um usuário logado (isso deve ser substituído pela sua lógica de autenticação)
-usuario_atual = st.text_input("Digite seu nome de usuário:", "")
+# Verificar se o nome do preenchedor está na lista de usuários com permissões especiais
+if nome_preenchedor in usuarios_superadmin:
+    st.subheader("teste")
 
 st.title("Rota")
 
