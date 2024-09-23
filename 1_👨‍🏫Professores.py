@@ -263,6 +263,6 @@ if nome_preenchedor in usuarios_superadmin:
         st.download_button(
             label="Baixar Excel",
             data=buffer,
-            file_name="disponibilidade_professores.xlsx",
+            file_name="PROFESSORES.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
