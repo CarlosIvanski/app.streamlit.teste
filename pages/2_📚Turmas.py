@@ -3,9 +3,14 @@ import pandas as pd
 
 # Criando um DataFrame de exemplo com dados de informação
 data = {
-    "Data de Informação": ["2024-09-20", "2024-09-21", "2024-09-22"],
-    "Nome": ["Professor A", "Professor B", "Professor C"],
-    "Disponibilidade": ["Sim", "Não", "Sim"]
+    "Grupo": ["Abu Dhabi Online", "Auckland Presencial", "Botswana Online", "Brooklyn Presencial", "Chicago Presencial", "Connecticut Presencial"],
+    "Horário": ["19:00", "19:00", "19:00", "19:00", "19:00", "19:00"],
+    "Unidade": ["Vicentina", "Satélite", "Vicentina", "Satélite", "Jardim", "Satélite"],
+    "Dias da Semana": ["2ª ● 3ª ● 4ª ● 5ª", "2ª ● 3ª ● 4ª ● 5ª", "2ª ● 4ª ● 5ª", "2ª ● 3ª ● 5ª", "2ª ● 3ª ● 4ª ● 5ª", "2ª ● 3ª ● 5ª"],
+    "MOD": ["Grupo", "Grupo", "Grupo", "Grupo", "Grupo", "Grupo"],
+    "N Aulas": ["4", "4", "3", "3", "4", "3"],
+    "Teacher": ["", "", "", "", "", ""],
+    "Status": ["Online", "Presencial", "Online", "Presencial", "Presencial", "Presencial"]
 }
 
 df = pd.DataFrame(data)
