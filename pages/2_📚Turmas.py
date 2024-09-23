@@ -2,12 +2,12 @@ import streamlit as st
 import pandas as pd
 import io
 
+# Configuração da página
 st.set_page_config(layout="wide")
-
 
 # Lista de usuários superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
-usuario_permitido = "usuario_especifico"  # Substitua pelo nome do usuário permitido para upload
+usuario_permitido = "BrunoMorgilloCoordenadorSUPERADMIN_123456"  # Substitua pelo nome do usuário permitido para upload
 
 # Input do usuário
 usuario_atual = st.text_input("Digite seu nome de usuário:")
