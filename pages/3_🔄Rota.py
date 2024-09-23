@@ -60,13 +60,13 @@ if usuario_atual in usuarios_superadmin:
                 try:
                     if 'Professor' not in df_professores.columns:
                         st.error('Coluna "Professor" não encontrada no arquivo de professores.')
-                    elif 'Teacher' not in df_turmas.columns:
-                        st.error('Coluna "Teacher" não encontrada no arquivo de turmas.')
+                    elif 'Unnamed: 10' not in df_turmas.columns:
+                        st.error('Coluna "Unnamed: 10" não encontrada no arquivo de turmas.')
                     else:
                         df_fusao = df_turmas.copy()
 
                         if len(df_professores) <= len(df_turmas):
-                            df_fusao['Teacher'] = df_professores['Professor'].values[:len(df_turmas)]
+                            df_fusao['Unnamed: 10'] = df_professores['Professor'].values[:len(df_turmas)]
                         else:
                             st.warning("A tabela de professores tem mais linhas do que a tabela de turmas. Apenas as primeiras serão usadas.")
 
