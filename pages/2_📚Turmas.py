@@ -16,7 +16,7 @@ usuario_atual = st.text_input("Digite seu nome de usuário:")
 if usuario_atual in usuarios_superadmin:
     st.success("Acesso autorizado! Bem-vindo ao dashboard.")
 
-    def load_excel(uploaded_file, start_row=0):
+    def load_excel(uploaded_file, start_row=1):
         df = pd.read_excel(uploaded_file, skiprows=start_row)
         return df
 
@@ -30,7 +30,7 @@ if usuario_atual in usuarios_superadmin:
 
     if uploaded_file and usuario_atual == usuario_permitido:
         # Defina a linha a partir da qual você deseja começar a ler (por exemplo, 2 para começar da terceira linha)
-        df = load_excel(uploaded_file, start_row=2)
+        df = load_excel(uploaded_file, start_row=1)
         st.session_state['df_upload'] = df
         df.to_csv(csv_file_path, index=False)  # Salva os dados no CSV
         st.success(f'Arquivo {uploaded_file.name} carregado com sucesso!')
