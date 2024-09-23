@@ -61,8 +61,8 @@ if usuario_atual in usuarios_superadmin:
                 try:
                     if 'Professor' not in df_professores.columns:
                         st.error('Coluna "Professor" não encontrada no arquivo de professores.')
-                    elif 'Unnamed: 10' not in df_turmas.columns:
-                        st.error('Coluna "Unnamed: 10" não encontrada no arquivo de turmas.')
+                    elif 'Teacher' not in df_turmas.columns:
+                        st.error('Coluna "Teacher" não encontrada no arquivo de turmas.')
                     else:
                         df_fusao = df_turmas.copy()
 
@@ -71,9 +71,9 @@ if usuario_atual in usuarios_superadmin:
                         n_turmas = len(df_turmas)
 
                         if n_professores < n_turmas:
-                            df_fusao['Unnamed: 10'] = pd.Series(df_professores['Professor'].values)
+                            df_fusao['Teacher'] = pd.Series(df_professores['Professor'].values)
                         else:
-                            df_fusao['Unnamed: 10'] = df_professores['Professor'].values[:n_turmas]
+                            df_fusao['Teacher'] = df_professores['Professor'].values[:n_turmas]
 
                         st.success("Fusão realizada com sucesso! Nova tabela criada.")
                         
