@@ -3,7 +3,6 @@ import pandas as pd
 
 st.set_page_config(layout="wide")
 
-# Criando um DataFrame de exemplo com dados de informação
 data = {
     "Grupo": ["Abu Dhabi Online", "Auckland Presencial", "Botswana Online", "Brooklyn Presencial", "Chicago Presencial", "Connecticut Presencial"],
     "Horário": ["19:00", "19:00", "19:00", "19:00", "19:00", "19:00"],
@@ -17,15 +16,12 @@ data = {
 
 df = pd.DataFrame(data)
 
-# Exibindo a tabela no Streamlit
-st.write("Tabela de Disponibilidade:")
+st.write("Tabela de Turmas:")
 st.dataframe(df)
 
-# Exportando para Excel
 excel_file = "disponibilidade.xlsx"
 df.to_excel(excel_file, index=False)
 
-# Botão para download
 st.download_button(
     label="Baixar tabela como Excel",
     data=open(excel_file, "rb").read(),
