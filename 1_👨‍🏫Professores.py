@@ -219,11 +219,21 @@ def converter_para_dataframe(dados, nome_usuario, data):
 # Converter os dados coletados para um DataFrame
 df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
 
+# Adiciona uma variável no session_state para controlar o salvamento
+if 'save_button_clicked' not in st.session_state:
+    st.session_state.save_button_clicked = False
+
 # Botão para salvar os dados na tabela em tempo real
 if st.button("Salvar dados"):
+    st.session_state.save_button_clicked = True
+
+# Somente salva os dados se o botão foi clicado
+if st.session_state.save_button_clicked:
+    df_novo = converter_para_dataframe(st.session_state.disponibilidade, nome_preenchedor, data_modificacao)
     st.session_state.df_disponibilidade = pd.concat([st.session_state.df_disponibilidade, df_novo], ignore_index=True)
     salvar_dados(st.session_state.df_disponibilidade)
     st.success("Dados salvos com sucesso!")
+    st.session_state.save_button_clicked = False  # Reseta o estado do botão
 
 # Definir uma lista de usuários com permissões especiais
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
