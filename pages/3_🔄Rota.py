@@ -79,6 +79,10 @@ if usuario_atual in usuarios_superadmin:
                     }
                     df_pre_programado = pd.DataFrame(dados_pre_programados)
 
+                    # Garantir que as colunas tenham o mesmo tipo
+                    df_turmas['Teacher'] = df_turmas['Teacher'].astype(str)
+                    df_pre_programado['Professor'] = df_pre_programado['Professor'].astype(str)
+
                     # Combinar os dados da tabela pré-programada com os dados da segunda planilha
                     df_fusao = pd.merge(df_turmas, df_pre_programado, left_on='Teacher', right_on='Professor', how='outer')
 
