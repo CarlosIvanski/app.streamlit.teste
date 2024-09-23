@@ -1,3 +1,5 @@
+encaixa nesse meu codigo fazendo as alterações e remoções necessarias
+
 import streamlit as st
 import pandas as pd
 import io
@@ -52,58 +54,48 @@ if usuario_atual in usuarios_superadmin:
 
     st.subheader("Realizar Fusão dos Dados")
 
-    # Dados pré-programados para a tabela de fusão
-    dados_pre_programados = {
-        "Turma": [
-            "CONVERSATION 2 ONLINE",
-            "CONVERSATION 5 ONLINE",
-            "CONVERSATION 14 PRESENCIAL",
-            "CONVERSATION 12 PRESENCIAL",
-            "CONVERSATION 11 ONLINE",
-            "CONVERSATION 10 PRESENCIAL",
-            "CONVERSATION 7 PRESENCIAL",
-            "ACAPULCO COLABORADORES ONLINE",
-            "GALICIA ONLINE"
-        ],
-        "Professor": [
-            "Carlos", "Luciano", "Bruno", "Maria", 
-            "Maddie", "Luciana", "Bruno", "Maria", "Maria"
-        ]
-    }
-    df_pre_programado = pd.DataFrame(dados_pre_programados)
+    if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
+        if df_turmas is None or df_professores is None:
+            st.warning("Certifique-se de ter carregado os arquivos de turmas e professores.")
+        else:
+            st.write("Iniciando fusão...")
+            with st.spinner("Processando..."):
+                try:
+                    if 'Professor' not in df_professores.columns:
+                        st.error('Coluna "Professor" não encontrada no arquivo de professores.')
+                    elif 'Teacher' not in df_turmas.columns:
+                        st.error('Coluna "Teacher" não encontrada no arquivo de turmas.')
+                    else:
+                        df_fusao = df_turmas.copy()
 
-if st.button("Fundir Professores com Turmas e Criar Nova Tabela"):
-    st.write("Iniciando fusão...")
-    with st.spinner("Processando..."):
-        try:
-            # Verificando se ambos os DataFrames foram carregados
-            if df_professores is not None and df_turmas is not None:
-                # Presumindo que a coluna de professores na primeira tabela seja 'Professor'
-                df_fusao = df_turmas.copy()
+                        # Ajustar o número de linhas na fusão
+                        n_professores = len(df_professores)
+                        n_turmas = len(df_turmas)
 
-                # Realizando a fusão com base na coluna que une as duas tabelas
-                df_fusao = df_fusao.merge(df_professores[['Professor']], left_on='Grupo', right_on='Professor', how='left')
+                        if n_professores < n_turmas:
+                            df_fusao['Teacher'] = pd.Series(df_professores['Professor'].values)
+                        else:
+                            df_fusao['Teacher'] = df_professores['Professor'].values[:n_turmas]
 
-                # Se houver outras colunas a serem puxadas de df_professores, adicione-as aqui
+                        st.success("Fusão realizada com sucesso! Nova tabela criada.")
+                        
+                        st.subheader("Tabela de Fusão (Turmas + Professores)")
+                        st.dataframe(df_fusao)
 
-                st.success("Fusão realizada com sucesso! Nova tabela criada.")
-                
-                st.subheader("Tabela de Fusão (Turmas + Professores)")
-                st.dataframe(df_fusao)
+                        buffer = io.BytesIO()
+                        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                            df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
+                        buffer.seek(0)
 
-                buffer = io.BytesIO()
-                with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-                    df_fusao.to_excel(writer, index=False, sheet_name='Tabela de Fusão')
-                buffer.seek(0)
+                        st.download_button(
+                            label="Baixar Excel",
+                            data=buffer,
+                            file_name="tabela_fusao.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
 
-                st.download_button(
-                    label="Baixar Excel",
-                    data=buffer,
-                    file_name="tabela_fusao.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-            else:
-                st.error("Por favor, carregue ambas as tabelas antes de realizar a fusão.")
+                except Exception as e:
+                    st.error(f"Erro durante a fusão: {e}")
 
-        except Exception as e:
-            st.error(f"Erro durante a fusão: {e}")
+else:
+    st.warning("Você não tem permissão para acessar este dashboard. Por favor, insira um nome de usuário autorizado.")
