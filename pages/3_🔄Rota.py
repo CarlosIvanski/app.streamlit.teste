@@ -20,7 +20,7 @@ if usuario_atual in usuarios_superadmin:
     # Carregar o arquivo Excel
     if 'df_oculto' not in st.session_state:
         try:
-            st.session_state.df_oculto = pd.read_excel("dados.xlsx")  # Substitua pelo caminho do seu arquivo
+            st.session_state.df_oculto = pd.read_excel("TURMAS.xlsx")  # Substitua pelo caminho do seu arquivo
         except Exception as e:
             st.error(f"Erro ao carregar o arquivo Excel: {e}")
 
