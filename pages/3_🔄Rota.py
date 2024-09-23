@@ -13,8 +13,8 @@ if usuario_atual in usuarios_superadmin:
 
     st.subheader('Importar dados das turmas e professores')
 
-    def load_excel(uploaded_file):
-        df = pd.read_excel(uploaded_file)
+    def load_excel(uploaded_file, start_row=0):
+        df = pd.read_excel(uploaded_file, skiprows=start_row)
         return df
 
     uploaded_files = st.file_uploader("Escolha os arquivos Excel", type=["xlsx"], accept_multiple_files=True)
@@ -24,7 +24,9 @@ if usuario_atual in usuarios_superadmin:
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            df = load_excel(uploaded_file)
+            # Definindo a linha inicial para leitura
+            start_row = 1 if 'turmas' in uploaded_file.name.lower() else 0  # Começa da linha 2 para turmas, linha 1 para professores
+            df = load_excel(uploaded_file, start_row=start_row)
             st.session_state[f'df_{uploaded_file.name}'] = df
             st.success(f'Arquivo {uploaded_file.name} carregado com sucesso!')
 
@@ -69,10 +71,8 @@ if usuario_atual in usuarios_superadmin:
                         n_turmas = len(df_turmas)
 
                         if n_professores < n_turmas:
-                            # Preencher somente até o número de professores disponíveis
                             df_fusao['Unnamed: 10'] = pd.Series(df_professores['Professor'].values)
                         else:
-                            # Se houver mais professores do que turmas, use apenas os primeiros
                             df_fusao['Unnamed: 10'] = df_professores['Professor'].values[:n_turmas]
 
                         st.success("Fusão realizada com sucesso! Nova tabela criada.")
