@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import io
-import os
 
 # Lista de usuários superadministradores
 usuarios_superadmin = ["BrunoMorgilloCoordenadorSUPERADMIN_123456", "LuizaDiretoraSUPERADMIN", "EleyneDiretoraSUPERADMIN"]
@@ -19,14 +17,16 @@ if usuario_atual in usuarios_superadmin:
     if st.button("Clique aqui para armazenar dados"):
         st.success("Dados armazenados lidos com sucesso!")
 
-    # Carregar o arquivo Excel
+    # Verificar se o DataFrame já foi criado
     if 'df_oculto' not in st.session_state:
-        try:
-            st.session_state.df_oculto = pd.read_excel("TURMAS.xlsx")  # Substitua pelo caminho do seu arquivo
-        except Exception as e:
-            st.error(f"Erro ao carregar o arquivo Excel: {e}")
+        # Criar a tabela pré-armazenada
+        dados = {
+            "Coluna 1": ["Dado 1", "Dado 2", "Dado 3"],
+            "Coluna 2": ["Valor 1", "Valor 2", "Valor 3"]
+        }
+        st.session_state.df_oculto = pd.DataFrame(dados)
 
-    # Botão para exibir a tabela do Excel
+    # Botão para exibir a tabela
     if st.button("Mostrar dados gerenciáveis"):
         st.subheader("Tabela de Dados")
         st.dataframe(st.session_state.df_oculto)
